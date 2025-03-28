@@ -7,19 +7,27 @@ pipeline {
         SCANNER_HOME = tool 'sonar-scanner'  // Ensure 'sonar-scanner' is configured in Jenkins
     }
     stages {
+        stage('SSH Authentication') {
+            steps {
+                echo 'Testing SSH Authentication to GitHub'
+                sh 'ssh -T git@github.com'
+            }
+        }
+
         stage('Git Checkout') {
             steps {
                 echo 'Git Checkout'
                 git branch: 'main', credentialsId: 'git-cred', url: 'git@github.com:Muktamk/FullStack-Blogging-App.git'
             }
         }
+
         stage('Compile') {
             steps {
                 echo 'Compiling the application using Maven'
                 sh 'mvn compile'
             }
         }
-        
+
         // Uncomment and update the stage if you need Unit Testing
         /* stage('Unit Testing') {
             steps {
