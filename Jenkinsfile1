@@ -1,10 +1,10 @@
 pipeline {
     agent any
     tools {
-        maven 'M3'
+        maven 'M3'  // Ensure Maven tool 'M3' is configured in Jenkins Global Tool Configuration
     }
     environment {
-        SCANNER_HOME = tool 'sonar-scanner'
+        SCANNER_HOME = tool 'sonar-scanner'  // Ensure 'sonar-scanner' is configured in Jenkins
     }
     stages {
         stage('Git Checkout') {
@@ -15,101 +15,83 @@ pipeline {
         }
         stage('Compile') {
             steps {
+                echo 'Compiling the application using Maven'
                 sh 'mvn compile'
             }
         }
-        stage('Unit Testing') {
+        
+        // Uncomment and update the stage if you need Unit Testing
+        /* stage('Unit Testing') {
             steps {
                 echo 'Running Unit Tests'
                 sh 'mvn test'
             }
-        }
-        stage('Build') {
+        } */
+
+        // Uncomment and update this stage if you need to build the project and deploy to Nexus
+        /* stage('Build') {
             steps {
+                echo 'Building the application'
                 sh 'mvn package'
             }
         }
+        
         stage('Publish to Nexus') {
             steps {
-                withMaven(globalMavenSettingsConfig: 'maven-settings', jdk: '', maven: 'M3', mavenSettingsConfig: '', traceability: true) {
+                withMaven(globalMavenSettingsConfig: 'maven-settings', maven: 'M3') {
+                    echo 'Deploying to Nexus'
                     sh 'mvn deploy'
                 }
             }
-        }
+        } */
+
         stage('Build & Tag Docker Image') {
             steps {
                 script {
+                    // Ensure docker is configured correctly in Jenkins
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        echo 'Building Docker Image'
                         sh 'docker build -t mjcmathew/blogging-app:latest .'
                     }
                 }
             }
         }
-        stage('Scan Docker Image with Trivy') {
+        
+        // Uncomment and update the next stages if you want to scan and push Docker images
+        /* stage('Scan Docker Image with Trivy') {
             steps {
-                echo 'Scanning Docker Image'
+                echo 'Scanning Docker Image with Trivy'
                 sh 'trivy image --format table -o image-report.html mjcmathew/blogging-app:latest'
             }
         }
+        
         stage('Push Docker Image') {
             steps {
                 script {
+                    // Ensure docker is configured correctly in Jenkins
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        echo 'Pushing Docker Image to registry'
                         sh 'docker push mjcmathew/blogging-app:latest'
                     }
                 }
             }
-        }
-        stage('K8-Deployment') {
+        } */
+
+        // Uncomment and update the Kubernetes deployment stage if needed
+        /* stage('K8-Deployment') {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'mega_project-cluster', contextName: '', credentialsId: 'k8-cred', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://B154517178067F3EE04A5D80589BEFD1.gr7.us-east-2.eks.amazonaws.com') {
+                withKubeConfig(
+                    caCertificate: '', 
+                    clusterName: 'mega_project-cluster', 
+                    credentialsId: 'k8-cred', 
+                    namespace: 'webapps', 
+                    serverUrl: 'https://B154517178067F3EE04A5D80589BEFD1.gr7.us-east-2.eks.amazonaws.com'
+                ) {
+                    echo 'Deploying application to Kubernetes'
                     sh 'kubectl apply -f deployment-service.yml'
-                sleep 20
-                 }
+                    sleep 20  // Sleep here for waiting after deploy, remove it for production unless needed
+                }
             }
-        }
-       stage('Verify K8-Deployment') {
-            steps {
-                withKubeConfig(caCertificate: '', clusterName: 'mega_project-cluster', contextName: '', credentialsId: 'k8-cred', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://B154517178067F3EE04A5D80589BEFD1.gr7.us-east-2.eks.amazonaws.com') {
-                sh 'kubectl get pods -n webapps'
-                sh 'kubectl get svc -n webapps'
-            }
-        }
+        } */
     }
-        
-    }
-        post {
-    always {
-        script {
-            def jobName = env.JOB_NAME
-            def buildNumber = env.BUILD_NUMBER
-            def pipelineStatus = currentBuild.result ?: 'UNKNOWN'
-            def bannerColor = pipelineStatus.toUpperCase() == 'SUCCESS' ? 'green' : 'red'
-
-            def body = """
-                <html>
-                <body>
-                <div style="border: 4px solid ${bannerColor}; padding: 10px;">
-                <h2>${jobName} - Build ${buildNumber}</h2>
-                <div style="background-color: ${bannerColor}; padding: 10px;">
-                <h3 style="color: white;">Pipeline Status: ${pipelineStatus.toUpperCase()}</h3>
-                </div>
-                <p>Check the <a href="${BUILD_URL}">console output</a>.</p>
-                </div>
-                </body>
-                </html>
-            """
-
-            emailext (
-                subject: "${jobName} - Build ${buildNumber} - ${pipelineStatus.toUpperCase()}",
-                body: body,
-                to: 'mjcmathew@gmail.com',
-                from: 'jenkins@example.com',
-                replyTo: 'jenkins@example.com',
-                mimeType: 'text/html',
-                attachmentsPattern: 'trivy-image-report.html'
-            )
-        }
-    }
-}
 }
