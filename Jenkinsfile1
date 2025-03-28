@@ -17,7 +17,7 @@ pipeline {
         stage('Git Checkout') {
             steps {
                 echo 'Git Checkout'
-                git branch: 'main', credentialsId: 'git-cred', url: 'git@github.com:Muktamk/FullStack-Blogging-App.git'
+                git branch: 'main', credentialsId: 'github-ssh-credentials', url: 'git@github.com:Muktamk/FullStack-Blogging-App.git'
             }
         }
 
