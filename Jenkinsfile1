@@ -51,7 +51,7 @@ pipeline {
                     // Ensure docker is configured correctly in Jenkins
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
                         echo 'Building Docker Image'
-                        sh 'docker build -t mjcmathew/blogging-app:latest .'
+                        sh 'docker build -t docker push mukta178/product-dev:latest .'
                     }
                 }
             }
