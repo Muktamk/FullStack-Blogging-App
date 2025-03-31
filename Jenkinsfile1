@@ -17,12 +17,16 @@ pipeline {
                 echo 'Git Checkout'
                 script {
                     try {
+                        // Debugging Git version
+                        sh 'git --version'
+                        
                         // Attempting Git Checkout
                         git branch: 'main', credentialsId: 'github-ssh-credentials', url: 'git@github.com:Muktamk/FullStack-Blogging-App.git'
                     } catch (Exception e) {
                         // Catching and printing error if Git checkout fails
                         echo "Git Checkout failed: ${e.getMessage()}"
-                        currentBuild.result = 'FAILURE'
+                        currentBuild.result = 'FAILURE'  // Explicitly mark the build as failed
+                        error("Git Checkout failed.")  // Stop the pipeline execution here
                     }
                 }
             }
