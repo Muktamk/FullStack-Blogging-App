@@ -15,9 +15,20 @@ pipeline {
         stage('Git Checkout') {
             steps {
                 echo 'Git Checkout'
-                git branch: 'main', credentialsId: 'github-ssh-credentials', url: 'git@github.com:Muktamk/FullStack-Blogging-App.git'
+                script {
+                    try {
+                        // Attempting Git Checkout
+                        git branch: 'main', credentialsId: 'github-ssh-credentials', url: 'git@github.com:Muktamk/FullStack-Blogging-App.git'
+                    } catch (Exception e) {
+                        // Catching and printing error if Git checkout fails
+                        echo "Git Checkout failed: ${e.getMessage()}"
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
             }
         }
+
+        // Uncomment and configure the following stages based on your requirements
 
         // stage('Compile') {
         //     steps {
