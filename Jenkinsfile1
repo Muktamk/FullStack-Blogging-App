@@ -10,7 +10,7 @@ pipeline {
         stage('SSH Authentication') {
             steps {
                 echo 'Testing SSH Authentication to GitHub'
-                sh 'ssh -T git@github.com'
+                sh "ssh -T git@github.com"
             }
         }
 
