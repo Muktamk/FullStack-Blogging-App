@@ -41,7 +41,7 @@ pipeline {
         //         sh 'mvn package'
         //     }
         // }
-        
+
         // stage('Publish to Nexus') {
         //     steps {
         //         withMaven(globalMavenSettingsConfig: 'maven-settings', maven: 'M3') {
@@ -55,4 +55,47 @@ pipeline {
         //     steps {
         //         script {
         //             // Ensure docker is configured correctly in Jenkins
-        //
+        //             withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+        //                 echo 'Building Docker Image'
+        //                 sh 'docker build -t docker push mukta178/product-dev:latest .'
+        //             }
+        //         }
+        //     }
+        // }
+
+        // stage('Scan Docker Image with Trivy') {
+        //     steps {
+        //         echo 'Scanning Docker Image with Trivy'
+        //         sh 'trivy image --format table -o image-report.html mjcmathew/blogging-app:latest'
+        //     }
+        // }
+
+        // stage('Push Docker Image') {
+        //     steps {
+        //         script {
+        //             // Ensure docker is configured correctly in Jenkins
+        //             withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+        //                 echo 'Pushing Docker Image to registry'
+        //                 sh 'docker push mjcmathew/blogging-app:latest'
+        //             }
+        //         }
+        //     }
+        // }
+
+        // stage('K8-Deployment') {
+        //     steps {
+        //         withKubeConfig(
+        //             caCertificate: '', 
+        //             clusterName: 'mega_project-cluster', 
+        //             credentialsId: 'k8-cred', 
+        //             namespace: 'webapps', 
+        //             serverUrl: 'https://B154517178067F3EE04A5D80589BEFD1.gr7.us-east-2.eks.amazonaws.com'
+        //         ) {
+        //             echo 'Deploying application to Kubernetes'
+        //             sh 'kubectl apply -f deployment-service.yml'
+        //             sleep 20  // Sleep here for waiting after deploy, remove it for production unless needed
+        //         }
+        //     }
+        // }
+    }
+}
