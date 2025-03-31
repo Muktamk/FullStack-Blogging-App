@@ -3,9 +3,6 @@ pipeline {
     tools {
         maven 'M3'  // Ensure Maven tool 'M3' is configured in Jenkins Global Tool Configuration
     }
-    environment {
-        SCANNER_HOME = tool 'sonar-scanner'  // Ensure 'sonar-scanner' is configured in Jenkins
-    }
     stages {
         stage('SSH Authentication') {
             steps {
