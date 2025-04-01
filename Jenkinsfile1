@@ -22,12 +22,12 @@ pipeline {
              }
          }
 
-        // stage('Unit Testing') {
-        //     steps {
-        //         echo 'Running Unit Tests'
-        //         sh 'mvn test'
-        //     }
-        // }
+         stage('Unit Testing') {
+             steps {
+                 echo 'Running Unit Tests'
+                 sh 'mvn test'
+             }
+         }
 
         // stage('Build') {
         //     steps {
