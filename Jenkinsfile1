@@ -29,12 +29,12 @@ pipeline {
              }
          }
 
-        // stage('Build') {
-        //     steps {
-        //         echo 'Building the application'
-        //         sh 'mvn package'
-        //     }
-        // }
+         stage('Build') {
+             steps {
+                 echo 'Building the application'
+                 sh 'mvn package'
+             }
+         }
 
         // stage('Publish to Nexus') {
         //     steps {
