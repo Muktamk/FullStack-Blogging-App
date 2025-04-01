@@ -45,17 +45,17 @@ pipeline {
          //    }
          // }
 
-        // stage('Build & Tag Docker Image') {
-        //     steps {
-        //         script {
-        //             // Ensure docker is configured correctly in Jenkins
-        //             withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-        //                 echo 'Building Docker Image'
-        //                 sh 'docker build -t docker push mukta178/product-dev:latest .'
-        //             }
-        //         }
-        //     }
-        // }
+         stage('Build & Tag Docker Image') {
+             steps {
+                 script {
+                     // Ensure docker is configured correctly in Jenkins
+                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                         echo 'Building Docker Image'
+                         sh 'docker build -t docker push mukta178/product-dev:latest .'
+                     }
+                 }
+             }
+         }
 
         // stage('Scan Docker Image with Trivy') {
         //     steps {
