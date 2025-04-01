@@ -76,20 +76,22 @@ pipeline {
              }
          }
 
-        // stage('K8-Deployment') {
-        //     steps {
-        //         withKubeConfig(
-        //             caCertificate: '', 
-        //             clusterName: 'mega_project-cluster', 
-        //             credentialsId: 'k8-cred', 
-        //             namespace: 'webapps', 
-        //             serverUrl: 'https://B154517178067F3EE04A5D80589BEFD1.gr7.us-east-2.eks.amazonaws.com'
-        //         ) {
-        //             echo 'Deploying application to Kubernetes'
-        //             sh 'kubectl apply -f deployment-service.yml'
-        //             sleep 20  // Sleep here for waiting after deploy, remove it for production unless needed
-        //         }
-        //     }
-        // }
+       stage('K8-Deployment') {
+            steps {
+                withKubeConfig(caCertificate: '', clusterName: 'mega_project-cluster', contextName: '', credentialsId: 'k8-cred', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://B154517178067F3EE04A5D80589BEFD1.gr7.us-east-2.eks.amazonaws.com') {
+                    sh 'kubectl apply -f deployment-service.yml'
+                sleep 20
+                 }
+            }
+        }
+       stage('Verify K8-Deployment') {
+            steps {
+                withKubeConfig(caCertificate: '', clusterName: 'mega_project-cluster', contextName: '', credentialsId: 'k8-cred', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://B154517178067F3EE04A5D80589BEFD1.gr7.us-east-2.eks.amazonaws.com') {
+                sh 'kubectl get pods -n webapps'
+                sh 'kubectl get svc -n webapps'
+            }
+        }
+    }
+      
     } // Closing the 'stages' block
 } // Closing the 'pipeline' block
