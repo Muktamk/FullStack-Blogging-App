@@ -78,7 +78,7 @@ pipeline {
 
        stage('K8-Deployment') {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'mega_project-cluster', contextName: '', credentialsId: 'k8-cred', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://B154517178067F3EE04A5D80589BEFD1.gr7.us-east-2.eks.amazonaws.com') {
+                withKubeConfig(caCertificate: '', clusterName: 'product-dev', contextName: '', credentialsId: 'k8-cred', namespace: 'sb-test', restrictKubeConfigAccess: false, serverUrl: 'https://B154517178067F3EE04A5D80589BEFD1.gr7.us-east-2.eks.amazonaws.com') {
                     sh 'kubectl apply -f deployment-service.yml'
                 sleep 20
                  }
@@ -86,9 +86,9 @@ pipeline {
         }
        stage('Verify K8-Deployment') {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'mega_project-cluster', contextName: '', credentialsId: 'k8-cred', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://B154517178067F3EE04A5D80589BEFD1.gr7.us-east-2.eks.amazonaws.com') {
-                sh 'kubectl get pods -n webapps'
-                sh 'kubectl get svc -n webapps'
+                withKubeConfig(caCertificate: '', clusterName: 'product-dev', contextName: '', credentialsId: 'k8-cred', namespace: 'sb-test', restrictKubeConfigAccess: false, serverUrl: 'https://B154517178067F3EE04A5D80589BEFD1.gr7.us-east-2.eks.amazonaws.com') {
+                sh 'kubectl get pods -n sb-test'
+                sh 'kubectl get svc -n sb-test'
             }
         }
     }
