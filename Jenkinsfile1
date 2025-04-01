@@ -64,17 +64,17 @@ pipeline {
              }
          }
 
-        // stage('Push Docker Image') {
-        //     steps {
-        //         script {
-        //             // Ensure docker is configured correctly in Jenkins
-        //             withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-        //                 echo 'Pushing Docker Image to registry'
-        //                 sh 'docker push mjcmathew/blogging-app:latest'
-        //             }
-        //         }
-        //     }
-        // }
+         stage('Push Docker Image') {
+             steps {
+                 script {
+                     // Ensure docker is configured correctly in Jenkins
+                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                         echo 'Pushing Docker Image to registry'
+                         sh 'docker push mukta178/product-dev:latest'
+                     }
+                 }
+             }
+         }
 
         // stage('K8-Deployment') {
         //     steps {
