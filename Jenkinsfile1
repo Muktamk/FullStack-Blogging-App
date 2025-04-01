@@ -2,16 +2,9 @@ pipeline {
     agent any
     tools {
         maven 'M3'  // Ensure Maven tool 'M3' is configured in Jenkins Global Tool Configuration
-        git 'git'  // Ensure Git tool is configured in Jenkins Global Tool Configuration
+        git 'git'    // Ensure Git tool is configured in Jenkins Global Tool Configuration
     }
     stages {
-        stage('SSH Authentication') {
-            steps {
-                echo 'Testing SSH Authentication to GitHub'
-                sh "ssh -T git@github.com"
-            }
-        }
-
         stage('Git Checkout') {
             steps {
                 echo 'Git Checkout'
@@ -110,5 +103,5 @@ pipeline {
         //         }
         //     }
         // }
-    }
+    } // Closing the 'stages' block
 }
