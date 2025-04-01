@@ -1,8 +1,8 @@
 pipeline {
     agent any
     tools {
-        maven 'M3'  // Ensure Maven tool 'M3' is configured in Jenkins Global Tool Configuration
-        git 'git'    // Ensure Git tool is configured in Jenkins Global Tool Configuration
+        maven 'M3'  
+        git 'git'    
     }
     stages {
 
