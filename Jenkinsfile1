@@ -36,14 +36,14 @@ pipeline {
              }
          }
 
-         stage('Publish to Nexus') {
-             steps {
-                 withMaven(globalMavenSettingsConfig: '8922a16d-d9b3-4292-9d4c-84e6993d104a', maven: 'M3') {
-                     echo 'Deploying to Nexus'
-                     sh 'mvn deploy'
-                 }
-             }
-         }
+         //stage('Publish to Nexus') {
+         //    steps {
+         //        withMaven(globalMavenSettingsConfig: '8922a16d-d9b3-4292-9d4c-84e6993d104a', maven: 'M3') {
+         //            echo 'Deploying to Nexus'
+         //            sh 'mvn deploy'
+         //        }
+         //    }
+         // }
 
         // stage('Build & Tag Docker Image') {
         //     steps {
