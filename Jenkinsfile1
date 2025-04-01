@@ -5,6 +5,13 @@ pipeline {
         git 'git'    // Ensure Git tool is configured in Jenkins Global Tool Configuration
     }
     stages {
+        // stage('SSH Authentication') { // Commented this stage out
+        //     steps {
+        //         echo 'Testing SSH Authentication to GitHub'
+        //         sh "ssh -T git@github.com"
+        //     }
+        // }
+
         stage('Git Checkout') {
             steps {
                 echo 'Git Checkout'
@@ -104,4 +111,4 @@ pipeline {
         //     }
         // }
     } // Closing the 'stages' block
-}
+} // Closing the 'pipeline' block
