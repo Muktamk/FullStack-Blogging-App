@@ -60,7 +60,7 @@ pipeline {
          stage('Scan Docker Image with Trivy') {
              steps {
                  echo 'Scanning Docker Image with Trivy'
-                 sh 'trivy image --format table -o image-report.html mjcmathew/blogging-app:latest'
+                 sh 'trivy image --format table -o image-report.html mukta178/product-dev:latest'
              }
          }
 
