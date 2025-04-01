@@ -13,14 +13,14 @@ pipeline {
             }
         }
 
-        // Uncomment and configure the following stages based on your requirements
+        
 
-        // stage('Compile') {
-        //     steps {
-        //         echo 'Compiling the application using Maven'
-        //         sh 'mvn compile'
-        //     }
-        // }
+         stage('Compile') {
+             steps {
+                 echo 'Compiling the application using Maven'
+                 sh 'mvn compile'
+             }
+         }
 
         // stage('Unit Testing') {
         //     steps {
