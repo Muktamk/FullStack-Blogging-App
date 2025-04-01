@@ -57,12 +57,12 @@ pipeline {
              }
          }
 
-        // stage('Scan Docker Image with Trivy') {
-        //     steps {
-        //         echo 'Scanning Docker Image with Trivy'
-        //         sh 'trivy image --format table -o image-report.html mjcmathew/blogging-app:latest'
-        //     }
-        // }
+         stage('Scan Docker Image with Trivy') {
+             steps {
+                 echo 'Scanning Docker Image with Trivy'
+                 sh 'trivy image --format table -o image-report.html mjcmathew/blogging-app:latest'
+             }
+         }
 
         // stage('Push Docker Image') {
         //     steps {
