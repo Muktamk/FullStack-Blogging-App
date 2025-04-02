@@ -13,85 +13,89 @@ pipeline {
             }
         }
 
-        
-
-         stage('Compile') {
-             steps {
-                 echo 'Compiling the application using Maven'
-                 sh 'mvn compile'
-             }
-         }
-
-         stage('Unit Testing') {
-             steps {
-                 echo 'Running Unit Tests'
-                 sh 'mvn test'
-             }
-         }
-
-         stage('Build') {
-             steps {
-                 echo 'Building the application'
-                 sh 'mvn package'
-             }
-         }
-
-         //stage('Publish to Nexus') {
-         //    steps {
-         //        withMaven(globalMavenSettingsConfig: '8922a16d-d9b3-4292-9d4c-84e6993d104a', maven: 'M3') {
-         //            echo 'Deploying to Nexus'
-         //            sh 'mvn deploy'
-         //        }
-         //    }
-         // }
-
-         stage('Build & Tag Docker Image') {
-             steps {
-                 script {
-                     // Ensure docker is configured correctly in Jenkins
-                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                         echo 'Building Docker Image'
-                         sh 'docker build -t mukta178/product-dev:latest .'
-                     }
-                 }
-             }
-         }
-
-         stage('Scan Docker Image with Trivy') {
-             steps {
-                 echo 'Scanning Docker Image with Trivy'
-                 sh 'trivy image --format table -o image-report.html mukta178/product-dev:latest'
-             }
-         }
-
-         stage('Push Docker Image') {
-             steps {
-                 script {
-                     // Ensure docker is configured correctly in Jenkins
-                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                         echo 'Pushing Docker Image to registry'
-                         sh 'docker push mukta178/product-dev:latest'
-                     }
-                 }
-             }
-         }
-
-       stage('K8-Deployment') {
+        stage('Compile') {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'product-dev', contextName: '', credentialsId: 'k8-cred', namespace: 'sb-test', restrictKubeConfigAccess: false, serverUrl: 'https://0DB98FF44614C92E257E548E95115C01.sk1.us-east-2.eks.amazonaws.com') {
-                    sh 'kubectl apply -f deployment-service.yml'
-                sleep 20
-                 }
+                echo 'Compiling the application using Maven'
+                sh 'mvn compile'
             }
         }
-       stage('Verify K8-Deployment') {
+
+        stage('Unit Testing') {
+            steps {
+                echo 'Running Unit Tests'
+                sh 'mvn test'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Building the application'
+                sh 'mvn package'
+            }
+        }
+
+        // Optional: Re-enable if you want to deploy to Nexus
+        // stage('Publish to Nexus') {
+        //     steps {
+        //         withMaven(globalMavenSettingsConfig: '8922a16d-d9b3-4292-9d4c-84e6993d104a', maven: 'M3') {
+        //             echo 'Deploying to Nexus'
+        //             sh 'mvn deploy'
+        //         }
+        //     }
+        // }
+
+        stage('Build & Tag Docker Image') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        echo 'Building Docker Image'
+                        sh 'docker build -t mukta178/product-dev:latest .'
+                    }
+                }
+            }
+        }
+
+        stage('Scan Docker Image with Trivy') {
+            steps {
+                echo 'Scanning Docker Image with Trivy'
+                sh 'trivy image --format table -o image-report.html mukta178/product-dev:latest'
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        echo 'Pushing Docker Image to registry'
+                        sh 'docker push mukta178/product-dev:latest'
+                    }
+                }
+            }
+        }
+
+        stage('K8-Deployment') {
             steps {
                 withKubeConfig(caCertificate: '', clusterName: 'product-dev', contextName: '', credentialsId: 'k8-cred', namespace: 'sb-test', restrictKubeConfigAccess: false, serverUrl: 'https://0DB98FF44614C92E257E548E95115C01.sk1.us-east-2.eks.amazonaws.com') {
-                sh 'kubectl get pods -n sb-test'
-                sh 'kubectl get svc -n sb-test'
+                    echo 'Deploying to Kubernetes'
+                    sh 'kubectl apply -f deployment-service.yml'
+
+                    // Wait for deployment to complete
+                    sh 'kubectl rollout status deployment/bloggingapp-deployment -n sb-test --timeout=600s'
+                }
+            }
+        }
+
+        stage('Verify K8-Deployment') {
+            steps {
+                withKubeConfig(caCertificate: '', clusterName: 'product-dev', contextName: '', credentialsId: 'k8-cred', namespace: 'sb-test', restrictKubeConfigAccess: false, serverUrl: 'https://0DB98FF44614C92E257E548E95115C01.sk1.us-east-2.eks.amazonaws.com') {
+                    echo 'Verifying Kubernetes Deployment'
+                    sh 'kubectl get pods -n sb-test'
+                    sh 'kubectl get svc -n sb-test'
+
+                    // Optional: Check for pod readiness
+                    sh 'kubectl wait --for=condition=available deployment/bloggingapp-deployment -n sb-test --timeout=600s'
+                }
             }
         }
     }
-      
-    } // Closing the 'stages' block
-} // Closing the 'pipeline' block
+}
