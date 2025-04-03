@@ -105,7 +105,7 @@ pipeline {
         stage('K8-Deployment') {
             steps {
                 // withKubeConfig(clusterName: 'product-dev', contextName: '', credentialsId: 'k8-cred', namespace: 'sb-test', restrictKubeConfigAccess: false, serverUrl: 'https://0DB98FF44614C92E257E548E95115C01.sk1.us-east-2.eks.amazonaws.com') {
-                sh 'kubectl apply -f deployment-service.yml'
+                sh 'kubectl apply -f deployment-service.yml -n sb-test'
                 sleep 20
             }
         }
