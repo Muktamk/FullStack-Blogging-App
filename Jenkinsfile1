@@ -5,7 +5,6 @@ pipeline {
         git 'git'
     }
     stages {
-
         stage('Git Checkout') {
             steps {
                 echo 'Git Checkout'
@@ -105,21 +104,18 @@ pipeline {
 
         stage('K8-Deployment') {
             steps {
-               // withKubeConfig(clusterName: 'product-dev', contextName: '', credentialsId: 'k8-cred', namespace: 'sb-test', restrictKubeConfigAccess: false, serverUrl: 'https://0DB98FF44614C92E257E548E95115C01.sk1.us-east-2.eks.amazonaws.com') {
-                    sh 'kubectl apply -f deployment-service.yml'
-                    sleep 20
-                }
+                // withKubeConfig(clusterName: 'product-dev', contextName: '', credentialsId: 'k8-cred', namespace: 'sb-test', restrictKubeConfigAccess: false, serverUrl: 'https://0DB98FF44614C92E257E548E95115C01.sk1.us-east-2.eks.amazonaws.com') {
+                sh 'kubectl apply -f deployment-service.yml'
+                sleep 20
             }
         }
 
         stage('Verify K8-Deployment') {
             steps {
-               // withKubeConfig(caCertificate: '', clusterName: 'product-dev', contextName: '', credentialsId: 'k8-cred', namespace: 'sb-test', restrictKubeConfigAccess: false, serverUrl: 'https://0DB98FF44614C92E257E548E95115C01.sk1.us-east-2.eks.amazonaws.com') {
-                    sh 'kubectl get pods -n sb-test'
-                    sh 'kubectl get svc -n sb-test'
-                }
+                // withKubeConfig(caCertificate: '', clusterName: 'product-dev', contextName: '', credentialsId: 'k8-cred', namespace: 'sb-test', restrictKubeConfigAccess: false, serverUrl: 'https://0DB98FF44614C92E257E548E95115C01.sk1.us-east-2.eks.amazonaws.com') {
+                sh 'kubectl get pods -n sb-test'
+                sh 'kubectl get svc -n sb-test'
             }
         }
-
-    } // Closing the 'stages' block
-} // Closing the 'pipeline' block
+    }
+}
