@@ -53,6 +53,11 @@ pipeline {
                 }
             }
         }
+        stage('before build') {
+            steps {
+                echo 'before build'
+            }
+        }
         stage('Build & Tag Docker Image') {
             steps {
                 script {
@@ -62,10 +67,20 @@ pipeline {
                 }
             }
         }
+        stage('after build') {
+            steps {
+                echo 'after build'
+            }
+        }
         stage('Scan Docker Image with Trivy') {
             steps {
                 echo 'Scanning Docker Image'
                 sh 'trivy image --format table -o image-report.html mjcmathew/blogging-app:latest'
+            }
+        }
+        stage('before push') {
+            steps {
+                echo 'before push'
             }
         }
         stage('Push Docker Image') {
@@ -75,6 +90,11 @@ pipeline {
                         sh 'docker push mjcmathew/blogging-app:latest'
                     }
                 }
+            }
+        }
+         stage('after push') {
+            steps {
+                echo 'after push'
             }
         }
         stage('K8-Deployment') {
