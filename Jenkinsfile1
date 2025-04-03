@@ -82,7 +82,7 @@ pipeline {
                 echo 'Connecting to Bastion Host and accessing Kubernetes cluster'
 
                 // Using SSH to connect to Bastion Host
-                withCredentials([sshUserPrivateKey(credentialsId: 'kubernetes-connection', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([file(credentialsId: 'kubernetes-ssh-key', variable: 'SSH_KEY')]) {
                     sh """
                         # SSH into Bastion Host
                         ssh -o StrictHostKeyChecking=no -i \$SSH_KEY ec2-user@ec2-52-14-0-68.us-east-2.compute.amazonaws.com << EOF
@@ -102,29 +102,26 @@ pipeline {
             }
         }
 
-        // Modify the deployment stage to pull the deployment files from GitHub on Bastion
+        // Modify the deployment stage to use scp to copy files from Jenkins workspace to Bastion
         stage('K8-Deployment') {
             steps {
                 echo 'Deploying to Kubernetes from Bastion Host'
 
-                // SSH into Bastion and apply the deployment from there
-                withCredentials([sshUserPrivateKey(credentialsId: 'kubernetes-connection', keyFileVariable: 'SSH_KEY')]) {
+                // SCP the files from Jenkins workspace to Bastion Host
+                withCredentials([file(credentialsId: 'kubernetes-ssh-key', variable: 'SSH_KEY')]) {
                     sh """
-                        # SSH into Bastion Host
+                        # SCP the files from Jenkins workspace to Bastion Host
+                        scp -o StrictHostKeyChecking=no -i \$SSH_KEY -r \$WORKSPACE/FullStack-Blogging-App ec2-user@ec2-52-14-0-68.us-east-2.compute.amazonaws.com:/home/ec2-user/
+
+                        # SSH into Bastion Host to apply the deployment
                         ssh -o StrictHostKeyChecking=no -i \$SSH_KEY ec2-user@ec2-52-14-0-68.us-east-2.compute.amazonaws.com << EOF
                         echo 'Inside Bastion Host'
 
                         # Update kubeconfig to access Kubernetes cluster
                         aws eks --region us-east-2 update-kubeconfig --name product-dev
 
-                        # Clone the repository if the directory doesn't exist
-                        if [ ! -d "FullStack-Blogging-App" ]; then
-                            echo "Directory does not exist. Cloning repository..."
-                            git clone git@github.com:Muktamk/FullStack-Blogging-App.git
-                        fi
-
                         # Navigate to the folder containing the deployment files
-                        cd FullStack-Blogging-App
+                        cd /home/ec2-user/FullStack-Blogging-App
 
                         # List the files to verify that deployment-service.yml exists
                         ls -al
@@ -149,7 +146,7 @@ pipeline {
                 echo 'Verifying deployment in Kubernetes from Bastion Host'
 
                 // SSH into Bastion and verify the deployment from there
-                withCredentials([sshUserPrivateKey(credentialsId: 'kubernetes-connection', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([file(credentialsId: 'kubernetes-ssh-key', variable: 'SSH_KEY')]) {
                     sh """
                         # SSH into Bastion Host
                         ssh -o StrictHostKeyChecking=no -i \$SSH_KEY ec2-user@ec2-52-14-0-68.us-east-2.compute.amazonaws.com << EOF
