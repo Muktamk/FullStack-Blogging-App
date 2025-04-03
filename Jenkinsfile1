@@ -117,8 +117,11 @@ pipeline {
                         # Update kubeconfig to access Kubernetes cluster
                         aws eks --region us-east-2 update-kubeconfig --name product-dev
 
-                        # Clone the repository to get the deployment files
-                        git clone git@github.com:Muktamk/FullStack-Blogging-App.git
+                        # Clone the repository if the directory doesn't exist
+                        if [ ! -d "FullStack-Blogging-App" ]; then
+                            echo "Directory does not exist. Cloning repository..."
+                            git clone git@github.com:Muktamk/FullStack-Blogging-App.git
+                        fi
 
                         # Navigate to the folder containing the deployment files
                         cd FullStack-Blogging-App
