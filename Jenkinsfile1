@@ -102,7 +102,7 @@ pipeline {
             }
         }
 
-        // Modify the deployment stage to run from the Bastion host
+        // Modify the deployment stage to pull the deployment files from GitHub on Bastion
         stage('K8-Deployment') {
             steps {
                 echo 'Deploying to Kubernetes from Bastion Host'
@@ -116,6 +116,15 @@ pipeline {
 
                         # Update kubeconfig to access Kubernetes cluster
                         aws eks --region us-east-2 update-kubeconfig --name product-dev
+
+                        # Clone the repository to get the deployment files
+                        git clone git@github.com:Muktamk/FullStack-Blogging-App.git
+
+                        # Navigate to the folder containing the deployment files
+                        cd FullStack-Blogging-App
+
+                        # List the files to verify that deployment-service.yml exists
+                        ls -al
 
                         # Apply Kubernetes deployment
                         kubectl apply -f deployment-service.yml -n sb-test
