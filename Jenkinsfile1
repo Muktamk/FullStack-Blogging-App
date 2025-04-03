@@ -63,6 +63,11 @@ pipeline {
                  sh 'trivy image --format table -o image-report.html mukta178/product-dev:latest'
              }
          }
+        stage('before push') {
+            steps {
+                echo 'before push'
+            }
+        }
 
          stage('Push Docker Image') {
              steps {
@@ -75,6 +80,11 @@ pipeline {
                  }
              }
          }
+        stage('after push') {
+            steps {
+                echo 'after push'
+            }
+        }
 
        stage('K8-Deployment') {
             steps {
