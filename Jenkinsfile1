@@ -102,19 +102,59 @@ pipeline {
             }
         }
 
+        // Modify the deployment stage to run from the Bastion host
         stage('K8-Deployment') {
             steps {
-                // withKubeConfig(clusterName: 'product-dev', contextName: '', credentialsId: 'k8-cred', namespace: 'sb-test', restrictKubeConfigAccess: false, serverUrl: 'https://0DB98FF44614C92E257E548E95115C01.sk1.us-east-2.eks.amazonaws.com') {
-                sh 'kubectl apply -f deployment-service.yml -n sb-test'
-                sleep 20
+                echo 'Deploying to Kubernetes from Bastion Host'
+
+                // SSH into Bastion and apply the deployment from there
+                withCredentials([sshUserPrivateKey(credentialsId: 'kubernetes-connection', keyFileVariable: 'SSH_KEY')]) {
+                    sh """
+                        # SSH into Bastion Host
+                        ssh -o StrictHostKeyChecking=no -i \$SSH_KEY ec2-user@ec2-52-14-0-68.us-east-2.compute.amazonaws.com << EOF
+                        echo 'Inside Bastion Host'
+
+                        # Update kubeconfig to access Kubernetes cluster
+                        aws eks --region us-east-2 update-kubeconfig --name product-dev
+
+                        # Apply Kubernetes deployment
+                        kubectl apply -f deployment-service.yml -n sb-test
+
+                        # Sleep for a few seconds to allow deployment to propagate
+                        sleep 20
+
+                        # Exit from the Bastion Host
+                        exit
+                        EOF
+                    """
+                }
             }
         }
 
+        // Modify the verify stage to run from the Bastion host
         stage('Verify K8-Deployment') {
             steps {
-                // withKubeConfig(caCertificate: '', clusterName: 'product-dev', contextName: '', credentialsId: 'k8-cred', namespace: 'sb-test', restrictKubeConfigAccess: false, serverUrl: 'https://0DB98FF44614C92E257E548E95115C01.sk1.us-east-2.eks.amazonaws.com') {
-                sh 'kubectl get pods -n sb-test'
-                sh 'kubectl get svc -n sb-test'
+                echo 'Verifying deployment in Kubernetes from Bastion Host'
+
+                // SSH into Bastion and verify the deployment from there
+                withCredentials([sshUserPrivateKey(credentialsId: 'kubernetes-connection', keyFileVariable: 'SSH_KEY')]) {
+                    sh """
+                        # SSH into Bastion Host
+                        ssh -o StrictHostKeyChecking=no -i \$SSH_KEY ec2-user@ec2-52-14-0-68.us-east-2.compute.amazonaws.com << EOF
+                        echo 'Inside Bastion Host'
+
+                        # Update kubeconfig to access Kubernetes cluster
+                        aws eks --region us-east-2 update-kubeconfig --name product-dev
+
+                        # Verify the deployment
+                        kubectl get pods -n sb-test
+                        kubectl get svc -n sb-test
+
+                        # Exit from the Bastion Host
+                        exit
+                        EOF
+                    """
+                }
             }
         }
     }
